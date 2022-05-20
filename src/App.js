@@ -1,25 +1,103 @@
-import logo from './logo.svg';
+import React from 'react';
+import { useState, useEffect, useMemo } from 'react'
+import { useTable } from 'react-table'
 import './App.css';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
 function App() {
+  const [data, setData] = useState([])
+  const [error, setError] = useState()
+  const [loading, setLoading] = useState(true)
+  
+  const planets = useMemo(() => [
+    {
+      name: 'Luna',
+      rotation_period: '123',
+      orbital_period: '3000'
+    },
+    {
+      name: 'Vona',
+      rotation_period: '1',
+      orbital_period: '3'
+    },
+    {
+      name: 'Mara',
+      rotation_period: '12',
+      orbital_period: '300'
+    },
+  ], [])
+
+  const columns = useMemo(() => [
+      {
+        Header: 'Name',
+        accessor: 'name'
+      },
+      {
+        Header: 'Rotation period',
+        accessor: 'rotation_period'
+      },
+      {
+        Header: 'Orbital period',
+        accessor: 'orbital_period'
+      }
+  ], [])
+
+  
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({columns, data: planets})
+
+  useEffect(() => {
+    fetch('https://swapi.dev/api/planets')
+      .then(response => {
+        if(response.ok){
+          return response.json()
+        }
+        throw response
+      })
+      .then(data => {
+        setData(data)
+      })
+      .catch(error => {
+        console.error('Error fetching data: ', error)
+        setError(error)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+         <TableContainer component={Paper}>
+           <Table {...getTableProps}>
+              <TableHead>
+                {headerGroups.map((headerGroup) => (
+                  <TableRow {...headerGroup.getHeaderGroupProps()}>
+                    {headerGroup.headers.map((column) => (
+                      <TableCell {...column.getHeaderProps()}>
+                          {column.render('Header')}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHead>
+              <TableBody {...getTableBodyProps()}>
+                {rows.map(row => {
+                  prepareRow(row)
+                  return row.cells.map((cell, index) => (
+                    <TableCell {...cell.getCellProps()}>
+                      {cell.render('Cell')}
+                    </TableCell>
+                  ))
+                })}
+              </TableBody>
+           </Table>
+         </TableContainer>
+  ) 
 }
 
 export default App;
