@@ -1,112 +1,136 @@
-import React from 'react';
-import { useState, useEffect, useMemo } from 'react'
-import { useTable } from 'react-table'
-import './App.css';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import React from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useTable } from "react-table";
+import "./App.css";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
 
 function App() {
-  const [data, setData] = useState([])
-  const [error, setError] = useState()
-  const [loading, setLoading] = useState(true)
-  
-  const planets = useMemo(() => [
-    {
-      name: 'Luna',
-      rotation_period: '123',
-      orbital_period: '3000'
-    },
-    {
-      name: 'Vona',
-      rotation_period: '1',
-      orbital_period: '3'
-    },
-    {
-      name: 'Mara',
-      rotation_period: '12',
-      orbital_period: '300'
-    },
-  ], [])
+  const [data, setData] = useState([]);
+  const [error, setError] = useState();
+  const [loading, setLoading] = useState(true);
 
-  const columns = useMemo(() => [
+  const planets = useMemo(
+    () => [
       {
-        Header: 'Name',
-        accessor: 'name'
+        name: "Luna",
+        rotation_period: "123",
+        orbital_period: "3000",
       },
       {
-        Header: 'Rotation period',
-        accessor: 'rotation_period'
+        name: "Vona",
+        rotation_period: "1",
+        orbital_period: "3",
       },
       {
-        Header: 'Orbital period',
-        accessor: 'orbital_period'
-      }
-  ], [])
+        name: "Mara",
+        rotation_period: "12",
+        orbital_period: "300",
+      },
+    ],
+    []
+  );
 
-  
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({columns, data: planets})
+  const columns = useMemo(
+    () => [
+      {
+        Header: "Name",
+        accessor: "name",
+      },
+      {
+        Header: "Rotation period",
+        accessor: "rotation_period",
+      },
+      {
+        Header: "Orbital period",
+        accessor: "orbital_period",
+      },
+    ],
+    []
+  );
 
-  const planetsData = useMemo(() => [...data], [data])
-  const planetsColumns = useMemo(() => data[0], [data])
+  const planetsData = useMemo(() => [...data], [data]);
+  const planetsColumns = useMemo(
+    () =>
+      data[0]
+        ? Object.keys(data[0])
+            .filter(
+              (planet) =>
+                planet !== "edited" &&
+                planet !== "residents" &&
+                planet !== "films" &&
+                planet !== "created" &&
+                planet !== "url"
+            )
+            .map((planet) => {
+              return { Header: planet, accessor: planet };
+            })
+        : [],
+    [data]
+  );
 
-  console.log(data)
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+    useTable({ columns: planetsColumns, data: planetsData });
 
   useEffect(() => {
-    fetch('https://swapi.dev/api/planets')
-      .then(response => {
-        if(response.ok){
-          return response.json()
+    fetch("https://swapi.dev/api/planets")
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
         }
-        throw response
+        throw response;
       })
-      .then(data => {
-        setData(data.results)
+      .then((data) => {
+        setData(data.results);
       })
-      .catch(error => {
-        console.error('Error fetching data: ', error)
-        setError(error)
+      .catch((error) => {
+        console.error("Error fetching data: ", error);
+        setError(error);
       })
       .finally(() => {
-        setLoading(false)
-      })
-  }, [])
+        setLoading(false);
+      });
+  }, []);
 
   return (
-         <TableContainer component={Paper}>
-           <Table {...getTableProps}>
-              <TableHead >
-                {headerGroups.map((headerGroup) => (
-                  <TableRow {...headerGroup.getHeaderGroupProps()}>
-                    {headerGroup.headers.map((column) => (
-                      <TableCell style={{backgroundColor:'#473485', color: 'white'}}  {...column.getHeaderProps()}>
-                          {column.render('Header')}
-                      </TableCell>
-                    ))}
-                  </TableRow>
+    <TableContainer component={Paper}>
+      <Table {...getTableProps}>
+        <TableHead>
+          {headerGroups.map((headerGroup) => (
+            <TableRow {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column) => (
+                <TableCell
+                  style={{ backgroundColor: "#473485", color: "white" }}
+                  {...column.getHeaderProps()}
+                >
+                  {column.render("Header")}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableHead>
+        <TableBody {...getTableBodyProps()}>
+          {rows.map((row) => {
+            prepareRow(row);
+            return (
+              <TableRow {...row.getRowProps()}>
+                {row.cells.map((cell, index) => (
+                  <TableCell {...cell.getCellProps()}>
+                    {cell.render("Cell")}
+                  </TableCell>
                 ))}
-              </TableHead>
-              <TableBody {...getTableBodyProps()}>
-                {rows.map(row => {
-                  prepareRow(row)
-                    return (
-                      <TableRow {...row.getRowProps()}>
-                        {row.cells.map((cell, index) => (
-                            <TableCell {...cell.getCellProps()}>
-                              {cell.render('Cell')}
-                            </TableCell>
-                        ))}
-                      </TableRow>
-                    )
-                })}
-              </TableBody>
-           </Table>
-         </TableContainer>
-  ) 
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
 }
 
 export default App;
