@@ -1,7 +1,7 @@
-import React from "react";
 import { useState, useEffect, useMemo } from "react";
 import { useTable } from "react-table";
 import "./App.css";
+import Header from "./components/Header";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -9,6 +9,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import Container from "@mui/material/Container";
 
 function App() {
   const [data, setData] = useState([]);
@@ -67,38 +68,49 @@ function App() {
   }, [pageCount]);
 
   return (
-    <TableContainer component={Paper}>
-      <Table {...getTableProps}>
-        <TableHead>
-          {headerGroups.map((headerGroup) => (
-            <TableRow {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <TableCell
-                  style={{ backgroundColor: "#473485", color: "white" }}
-                  {...column.getHeaderProps()}
-                >
-                  {column.render("Header")}
-                </TableCell>
+    <Container maxWidth="false">
+      <Header />
+      {!loading && (
+        <TableContainer
+          component={Paper}
+          style={{ maxWidth: "80%", margin: "auto", marginTop: "90px" }}
+        >
+          <Table {...getTableProps}>
+            <TableHead>
+              {headerGroups.map((headerGroup) => (
+                <TableRow {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column) => (
+                    <TableCell
+                      style={{
+                        fontWeight: "bold",
+                        width: "10%",
+                      }}
+                      {...column.getHeaderProps()}
+                    >
+                      {column.render("Header")}
+                    </TableCell>
+                  ))}
+                </TableRow>
               ))}
-            </TableRow>
-          ))}
-        </TableHead>
-        <TableBody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
-              <TableRow {...row.getRowProps()}>
-                {row.cells.map((cell, index) => (
-                  <TableCell {...cell.getCellProps()}>
-                    {cell.render("Cell")}
-                  </TableCell>
-                ))}
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
+            </TableHead>
+            <TableBody {...getTableBodyProps()}>
+              {rows.map((row) => {
+                prepareRow(row);
+                return (
+                  <TableRow {...row.getRowProps()}>
+                    {row.cells.map((cell, index) => (
+                      <TableCell {...cell.getCellProps()}>
+                        {cell.render("Cell")}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+    </Container>
   );
 }
 
