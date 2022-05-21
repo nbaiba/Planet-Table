@@ -51,6 +51,11 @@ function App() {
   
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({columns, data: planets})
 
+  const planetsData = useMemo(() => [...data], [data])
+  const planetsColumns = useMemo(() => data[0], [data])
+
+  console.log(data)
+
   useEffect(() => {
     fetch('https://swapi.dev/api/planets')
       .then(response => {
@@ -60,7 +65,7 @@ function App() {
         throw response
       })
       .then(data => {
-        setData(data)
+        setData(data.results)
       })
       .catch(error => {
         console.error('Error fetching data: ', error)
@@ -74,11 +79,11 @@ function App() {
   return (
          <TableContainer component={Paper}>
            <Table {...getTableProps}>
-              <TableHead>
+              <TableHead >
                 {headerGroups.map((headerGroup) => (
                   <TableRow {...headerGroup.getHeaderGroupProps()}>
                     {headerGroup.headers.map((column) => (
-                      <TableCell {...column.getHeaderProps()}>
+                      <TableCell style={{backgroundColor:'#473485', color: 'white'}}  {...column.getHeaderProps()}>
                           {column.render('Header')}
                       </TableCell>
                     ))}
@@ -88,11 +93,15 @@ function App() {
               <TableBody {...getTableBodyProps()}>
                 {rows.map(row => {
                   prepareRow(row)
-                  return row.cells.map((cell, index) => (
-                    <TableCell {...cell.getCellProps()}>
-                      {cell.render('Cell')}
-                    </TableCell>
-                  ))
+                    return (
+                      <TableRow {...row.getRowProps()}>
+                        {row.cells.map((cell, index) => (
+                            <TableCell {...cell.getCellProps()}>
+                              {cell.render('Cell')}
+                            </TableCell>
+                        ))}
+                      </TableRow>
+                    )
                 })}
               </TableBody>
            </Table>
