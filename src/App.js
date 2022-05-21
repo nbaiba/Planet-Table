@@ -14,45 +14,7 @@ function App() {
   const [data, setData] = useState([]);
   const [error, setError] = useState();
   const [loading, setLoading] = useState(true);
-
-  const planets = useMemo(
-    () => [
-      {
-        name: "Luna",
-        rotation_period: "123",
-        orbital_period: "3000",
-      },
-      {
-        name: "Vona",
-        rotation_period: "1",
-        orbital_period: "3",
-      },
-      {
-        name: "Mara",
-        rotation_period: "12",
-        orbital_period: "300",
-      },
-    ],
-    []
-  );
-
-  const columns = useMemo(
-    () => [
-      {
-        Header: "Name",
-        accessor: "name",
-      },
-      {
-        Header: "Rotation period",
-        accessor: "rotation_period",
-      },
-      {
-        Header: "Orbital period",
-        accessor: "orbital_period",
-      },
-    ],
-    []
-  );
+  const [pageCount, setPageCount] = useState(1);
 
   const planetsData = useMemo(() => [...data], [data]);
   const planetsColumns = useMemo(
@@ -61,15 +23,15 @@ function App() {
         ? Object.keys(data[0])
             .filter(
               (planet) =>
-                planet !== "edited" &&
-                planet !== "residents" &&
-                planet !== "films" &&
-                planet !== "created" &&
-                planet !== "url"
+                !["edited", "residents", "films", "created", "url"].includes(
+                  planet
+                )
             )
-            .map((planet) => {
-              return { Header: planet, accessor: planet };
-            })
+            .map((key) => ({
+              Header:
+                key.charAt(0).toUpperCase() + key.slice(1).replace("_", " "),
+              accessor: key,
+            }))
         : [],
     [data]
   );
@@ -77,16 +39,19 @@ function App() {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns: planetsColumns, data: planetsData });
 
-  useEffect(() => {
-    fetch("https://swapi.dev/api/planets")
+  const fetchData = () => {
+    fetch(`https://swapi.dev/api/planets/?page=${pageCount}`)
       .then((response) => {
         if (response.ok) {
           return response.json();
         }
         throw response;
       })
-      .then((data) => {
-        setData(data.results);
+      .then((newData) => {
+        if (newData.next) {
+          setPageCount(pageCount + 1);
+        }
+        setData([...data, ...newData.results]);
       })
       .catch((error) => {
         console.error("Error fetching data: ", error);
@@ -95,7 +60,11 @@ function App() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [pageCount]);
 
   return (
     <TableContainer component={Paper}>
