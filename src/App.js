@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useTable } from "react-table";
 import "./App.css";
 import Header from "./components/Header";
+import ErrorMessage from "./components/ErrorMessage";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -16,6 +17,8 @@ function App() {
   const [error, setError] = useState();
   const [loading, setLoading] = useState(true);
   const [pageCount, setPageCount] = useState(1);
+
+  console.log(error);
 
   const planetsData = useMemo(() => [...data], [data]);
   const planetsColumns = useMemo(
@@ -69,6 +72,7 @@ function App() {
 
   return (
     <Container maxWidth="false">
+      {error && <ErrorMessage />}
       <Header />
       {!loading && (
         <TableContainer
