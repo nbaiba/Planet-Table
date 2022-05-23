@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useTable } from "react-table";
+import { useTable, useSortBy, useFilters } from "react-table";
 import "./App.css";
 import Header from "./components/Header";
 import ErrorMessage from "./components/ErrorMessage";
@@ -18,30 +18,41 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [pageCount, setPageCount] = useState(1);
 
-  console.log(error);
-
   const planetsData = useMemo(() => [...data], [data]);
   const planetsColumns = useMemo(
     () =>
       data[0]
         ? Object.keys(data[0])
             .filter(
-              (planet) =>
+              (key) =>
                 !["edited", "residents", "films", "created", "url"].includes(
-                  planet
+                  key
                 )
             )
-            .map((key) => ({
-              Header:
-                key.charAt(0).toUpperCase() + key.slice(1).replace("_", " "),
-              accessor: key,
-            }))
+            .map((key) => {
+              if (["name", "diameter", "gravity"].includes(key)) {
+                return {
+                  Header:
+                    key.charAt(0).toUpperCase() +
+                    key.slice(1).replace("_", " "),
+                  accessor: key,
+                };
+              } else {
+                return {
+                  Header:
+                    key.charAt(0).toUpperCase() +
+                    key.slice(1).replace("_", " "),
+                  accessor: key,
+                  disableSortBy: true,
+                };
+              }
+            })
         : [],
     [data]
   );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({ columns: planetsColumns, data: planetsData });
+    useTable({ columns: planetsColumns, data: planetsData }, useSortBy);
 
   const fetchData = () => {
     fetch(`https://swapi.dev/api/planets/?page=${pageCount}`)
@@ -77,7 +88,7 @@ function App() {
       {!loading && (
         <TableContainer
           component={Paper}
-          style={{ maxWidth: "80%", margin: "auto", marginTop: "90px" }}
+          sx={{ maxWidth: "90%", margin: "auto", marginTop: "90px" }}
         >
           <Table {...getTableProps}>
             <TableHead>
@@ -89,9 +100,16 @@ function App() {
                         fontWeight: "bold",
                         width: "10%",
                       }}
-                      {...column.getHeaderProps()}
+                      {...column.getHeaderProps(column.getSortByToggleProps())}
                     >
                       {column.render("Header")}
+                      <span>
+                        {column.isSorted
+                          ? column.isSortedDesc
+                            ? " ↓"
+                            : " ↑"
+                          : ""}
+                      </span>
                     </TableCell>
                   ))}
                 </TableRow>

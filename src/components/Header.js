@@ -34,7 +34,7 @@ const Header = () => {
           InputLabelProps={{
             style: { color: "#ffffff" },
           }}
-          sx={{ input: { color: "#fffffff" } }}
+          sx={{ input: { color: "#ffffff" } }}
         />
       </AppBar>
     </Box>

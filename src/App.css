@@ -9,5 +9,5 @@
 }
 
 .MuiInputBase-root.MuiInput-root:after {
-  border-bottom: 2px solid #ada6c5 !important;
+  border-bottom: 1px solid #ada6c5 !important;
 }
