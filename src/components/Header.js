@@ -1,15 +1,12 @@
-import TextField from "@mui/material/TextField";
 import AppBar from "@mui/material/AppBar";
-import SearchIcon from "@mui/icons-material/Search";
-import InputAdornment from "@mui/material/InputAdornment";
 import Box from "@mui/material/Box";
 
-const Header = () => {
+const Header = ({ searchbar }) => {
   return (
     <Box>
       <AppBar
         sx={{
-          paddingLeft: "10%",
+          paddingLeft: "5%",
           backgroundColor: "#473485",
           display: "flex",
           flexDirection: "row",
@@ -19,23 +16,7 @@ const Header = () => {
         }}
       >
         <h2>Planets</h2>
-        <TextField
-          color="primary"
-          id="standard-basic"
-          label="Search by name"
-          variant="standard"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon style={{ color: "#ffffff" }} />
-              </InputAdornment>
-            ),
-          }}
-          InputLabelProps={{
-            style: { color: "#ffffff" },
-          }}
-          sx={{ input: { color: "#ffffff" } }}
-        />
+        {searchbar.render("Filter")}
       </AppBar>
     </Box>
   );
