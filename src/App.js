@@ -21,11 +21,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [pageCount, setPageCount] = useState(1);
   const [dataLength, setDataLength] = useState();
-
   const planetsData = useMemo(() => [...data], [data]);
-
-  console.log(pageCount);
-
   const planetsColumns = useMemo(
     () =>
       data[0]
@@ -66,11 +62,10 @@ function App() {
       })
       .then((newData) => {
         setDataLength(newData.count);
+        setData([...data, ...newData.results]);
         if (newData.next) {
           setPageCount(pageCount + 1);
         }
-
-        setData([...data, ...newData.results]);
       })
       .catch((error) => {
         console.error("Error fetching data: ", error);
@@ -101,9 +96,9 @@ function App() {
               maxWidth: "90%",
               margin: "auto",
               marginTop: "90px",
+              marginBottom: "20px",
             }}
           >
-            {headerGroups[0].headers[0].render("Filter")}
             <Table {...getTableProps}>
               <TableHead>
                 {headerGroups.map((headerGroup) => (
