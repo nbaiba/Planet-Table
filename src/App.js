@@ -21,6 +21,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [pageCount, setPageCount] = useState(1);
   const [dataLength, setDataLength] = useState();
+
   const planetsData = useMemo(() => [...data], [data]);
   const planetsColumns = useMemo(
     () =>
@@ -93,7 +94,7 @@ function App() {
           <TableContainer
             component={Paper}
             sx={{
-              maxWidth: "90%",
+              maxWidth: { md: "90%" },
               margin: "auto",
               marginTop: "90px",
               marginBottom: "20px",

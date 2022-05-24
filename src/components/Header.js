@@ -6,12 +6,11 @@ const Header = ({ searchbar }) => {
     <Box>
       <AppBar
         sx={{
-          paddingLeft: "5%",
           backgroundColor: "#473485",
           display: "flex",
           flexDirection: "row",
-          gap: "60%",
-          justifyContent: "center",
+          gap: { sm: "5%", md: "60%" },
+          justifyContent: "space-around",
           alignItems: "center",
         }}
       >
